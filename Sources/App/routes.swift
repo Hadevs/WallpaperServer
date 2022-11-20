@@ -1,7 +1,19 @@
 import Vapor
 
 func routes(_ app: Application) throws {
-    app.get { req async in
+    func convertStringToDictionary(text: String) -> [[String: Any]] {
+       if let data = text.data(using: .utf8) {
+           do {
+               let json = (try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String: Any]]) ?? []
+               return json
+           } catch {
+               print("Something went wrong")
+           }
+       }
+       return []
+   }
+
+    app.get("categories") { req async -> [WallpaperCategory] in
         let directory = app.directory.workingDirectory
         let configDir = "Sources/App/Configuration"
         let arr = convertStringToDictionary(text: json)
@@ -35,22 +47,6 @@ func routes(_ app: Application) throws {
         }
 
         return result
-    }
-    
-    func convertStringToDictionary(text: String) -> [[String: Any]] {
-       if let data = text.data(using: .utf8) {
-           do {
-               let json = (try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String: Any]]) ?? []
-               return json
-           } catch {
-               print("Something went wrong")
-           }
-       }
-       return []
-   }
-
-    app.get("hello") { req async -> String in
-        "Hello, world!"
     }
 }
 
